@@ -1,22 +1,13 @@
 #include <iostream>
 #include <sstream>
 
-int selection_score(char chosen) {
-	if (chosen == 0)
-		return 1;
-	else if (chosen == 1)
-		return 2;
-	else
-		return 3;
-}
-
 int victory_score(char opponent, char me) {
 	if (opponent == me)
-		return 3;
+		return 3 + me + 1;
 	if ((3 + (me - opponent) % 3) % 3 == 2)
-		return 0;		
+		return me + 1;		
 	else 
-		return 6;
+		return 6 + me + 1;
 }
 
 int main(void) {
@@ -33,8 +24,8 @@ int main(void) {
 		a -= 'A';
 		b -= 'X';
 
-		total_score += selection_score(b) + victory_score(a, b);
-		total_score2 += selection_score((3 + (a + (b - 1) % 3)) % 3) + victory_score(a, (3 + (a + (b - 1) % 3)) % 3);
+		total_score += victory_score(a, b);
+		total_score2 += victory_score(a, (3 + (a + (b - 1) % 3)) % 3);
 	}
 
 	std::cout << total_score << "\n";
