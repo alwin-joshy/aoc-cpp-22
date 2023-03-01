@@ -2,6 +2,7 @@
 #include <array>
 #include <numeric>
 #include <algorithm>
+#include <memory>
 
 #define SIZE 1024
 
@@ -9,11 +10,11 @@ typedef struct node {
     std::string name;
     bool dir; 
     int size;
-    struct node *children[SIZE];
-    struct node *parent;
+    std::shared_ptr<struct node> children[SIZE];
+    std::shared_ptr<struct node> parent;
 } node_t;
 
-void print_tree(node_t *node) {
+void print_tree(std::shared_ptr<node_t> node) {
     std::cout << node->name << "\n";
     if (node->dir) {
         for (int i = 0; i < SIZE && node->children[i] != NULL; i++) {
@@ -22,7 +23,7 @@ void print_tree(node_t *node) {
     }
 }
 
-int calculate_sizes(node_t *node) {
+int calculate_sizes(std::shared_ptr<node_t> node) {
     if (!(node->dir)) {
         return node->size;
     }
@@ -38,7 +39,7 @@ int calculate_sizes(node_t *node) {
 // #define MAX_SIZE 100000
 #define MAX_SIZE 70000000
 
-void get_valid(node_t *node, std::vector<node_t *>& valid) {
+void get_valid(std::shared_ptr<node_t> node, std::vector<std::shared_ptr<node_t>>& valid) {
     if (node->size <= MAX_SIZE && node->dir) {
         valid.push_back(node);
     }
@@ -49,10 +50,10 @@ void get_valid(node_t *node, std::vector<node_t *>& valid) {
 }
 
 int main(void) {
-    node_t* curr_node = new node_t;
+    auto curr_node = std::make_shared<node_t>();
     std::string curr_str = "";
     std::getline(std::cin, curr_str);
-    node_t *base_node = curr_node;
+    auto base_node = curr_node;
 
     while (true) {
         if (curr_str == "") break;
@@ -70,12 +71,12 @@ int main(void) {
             int i = 0; 
             while (std::getline(std::cin, curr_str)) {
                 if (curr_str.substr(0, 3) == "dir") {
-                    curr_node->children[i] = new node_t;
+                    curr_node->children[i] = std::make_shared<node_t>();
                     curr_node->children[i]->name = curr_str.substr(4, curr_str.size());
                     curr_node->children[i]->dir = true;
                     curr_node->children[i]->parent = curr_node;
                 } else if (curr_str.c_str()[0] != '$' && curr_str != "") {
-                    curr_node->children[i] = new node_t;
+                    curr_node->children[i] = std::make_shared<node_t>();
                     curr_node->children[i]->size = stoi(curr_str.substr(0, curr_str.find(' ')));
                     curr_node->children[i]->dir = false;
                     curr_node->children[i]->name = curr_str.substr(curr_str.find(' ') + 1, curr_str.size());
@@ -110,32 +111,28 @@ int main(void) {
     calculate_sizes(base_node);
     std::cout << base_node->size << "\n";
 
-    auto valid = std::vector<node_t *>();
+    auto valid = std::vector<std::shared_ptr<node_t>>();
     get_valid(base_node, valid);
 
     int total = 0;
-    for (node_t *node: valid) {
+    for (auto node: valid) {
         total += node->size;
     }
 
     std::cout << total << "\n";
 
-    std::sort(valid.begin(), valid.end(), [](node_t *a, node_t *b) {
+    std::sort(valid.begin(), valid.end(), [](auto a, auto b) {
         return a->size < b->size;
     });
 
-    int amount_remaining = 70000000 - base_node->size;
-    int amount_needed = 30000000;
-    int amount_left =  amount_needed - amount_remaining;
+    auto amount_remaining = 70000000 - base_node->size;
+    auto amount_needed = 30000000;
+    auto amount_left =  amount_needed - amount_remaining;
 
-    for (node_t *node: valid) {
+    for (auto node: valid) {
         if (node->size > amount_left) {
             std::cout << node->size << "\n";
             break; 
         }
     }
-
-
-
-
 }
