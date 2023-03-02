@@ -1,9 +1,9 @@
 #include <iostream>
 #include <sstream>
 
-int board[3][3] = {{4, 1, 7},
-				   {8, 5, 2},
-				   {3, 9, 6}};
+int board[3][3] = 	{{4, 1, 7},
+				   	 {8, 5, 2},
+				   	 {3, 9, 6}};
 
 
 int victory_score(char opponent, char me) {
